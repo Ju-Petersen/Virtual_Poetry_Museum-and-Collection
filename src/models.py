@@ -10,14 +10,12 @@ from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 class Base(DeclarativeBase):
     pass
 
-
 poem_tags = Table(
     "poem_tags",
     Base.metadata,
     Column("poem_id", ForeignKey("poems.id"), primary_key=True),
     Column("tag_id", ForeignKey("tags.id"), primary_key=True),
 )
-
 
 class User(Base):
     __tablename__ = "users"
@@ -33,7 +31,6 @@ class User(Base):
     poems: Mapped[list["Poem"]] = relationship(back_populates="published_by_user")
     reports: Mapped[list["Report"]] = relationship(back_populates="reporter")
     history: Mapped[list["ViewHistory"]] = relationship(back_populates="user")
-
 
 class Author(Base):
     __tablename__ = "authors"

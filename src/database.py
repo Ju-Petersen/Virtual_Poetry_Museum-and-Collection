@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
@@ -15,14 +15,11 @@ def get_engine():
         return create_engine(database_url, connect_args={"check_same_thread": False})
     return create_engine(database_url, pool_pre_ping=True)
 
-
 engine = get_engine()
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
-
 def create_database() -> None:
     Base.metadata.create_all(bind=engine)
-
 
 def ensure_demo_data() -> None:
     session: Session = SessionLocal()
@@ -55,7 +52,12 @@ def ensure_demo_data() -> None:
 
         poem1 = Poem(
             title="Voz de Muitas Cidades",
-            body="Noite\n\nO vento passa pelo corredor\ncomo se escrevesse em silêncio\nmeu nome nas janelas.\n\nEu escuto a cidade\nrespirando em versos.",
+            body='''Noite
+            O vento passa pelo corredor
+            como se escrevesse em silêncio
+            meu nome nas janelas.
+            Eu escuto a cidade
+            respirando em versos.''',
             slug="voz-de-muitas-cidades",
             status="publicado",
             credit_type="autoral",
@@ -69,7 +71,12 @@ def ensure_demo_data() -> None:
 
         poem2 = Poem(
             title="Poema do Silêncio",
-            body="Silêncio\n\nNão grita, não pesa,\nmas mora no fundo dos quartos\nque a vida deixa vazios.\n\nE, mesmo assim,\nensina a ouvir.",
+            body='''Silêncio
+            Não grita, não pesa,
+            mas mora no fundo dos quartos
+            que a vida deixa vazios.
+            E, mesmo assim,
+            ensina a ouvir.''',
             slug="poema-do-silencio",
             status="rascunho",
             credit_type="de-terceiro",
@@ -85,19 +92,17 @@ def ensure_demo_data() -> None:
     finally:
         session.close()
 
-
 def add_demo_view(user_id: int, poem_id: int) -> None:
     session: Session = SessionLocal()
     try:
         existing = session.query(ViewHistory).filter_by(user_id=user_id, poem_id=poem_id).first()
         if existing:
-            existing.viewed_at = datetime.utcnow()
+            existing.viewed_at = datetime.now(timezone.utc)
         else:
-            session.add(ViewHistory(user_id=user_id, poem_id=poem_id, viewed_at=datetime.utcnow()))
+            session.add(ViewHistory(user_id=user_id, poem_id=poem_id, viewed_at=datetime.now(timezone.utc)))
         session.commit()
     finally:
         session.close()
-
 
 def create_report(poem_id: int, reason: str, reporter_user_id: int | None = None) -> None:
     session: Session = SessionLocal()

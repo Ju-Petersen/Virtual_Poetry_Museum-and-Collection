@@ -1,17 +1,17 @@
-from __future__ import annotations
+from __future__ import annotations # 
 
-import hashlib
-import re
-import sys
-from datetime import datetime
-from pathlib import Path
+import hashlib # 
+import re # 
+import sys # 
+from datetime import datetime, timezone
+from pathlib import Path # 
 from typing import Optional
 
 import streamlit as st
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent # 
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
@@ -20,8 +20,7 @@ from src.models import Author, Poem, Report, Tag, User, ViewHistory
 
 st.set_page_config(page_title="Museu Virtual de Poesia", page_icon="📜", layout="wide")
 
-
-def slugify(value: str) -> str:
+def slugify(value: str) -> str: # 
     value = value.lower().strip()
     value = re.sub(r"[^a-z0-9]+", "-", value)
     return value.strip("-")
@@ -48,9 +47,9 @@ def record_view(poem: Poem, user: Optional[User]) -> None:
     try:
         existing = session.query(ViewHistory).filter_by(user_id=user.id, poem_id=poem.id).first()
         if existing:
-            existing.viewed_at = datetime.utcnow()
+            existing.viewed_at = datetime.now(timezone.utc)
         else:
-            session.add(ViewHistory(user_id=user.id, poem_id=poem.id, viewed_at=datetime.utcnow()))
+            session.add(ViewHistory(user_id=user.id, poem_id=poem.id, viewed_at=datetime.now(timezone.utc)))
         session.commit()
     finally:
         session.close()
@@ -91,6 +90,10 @@ def render_gallery() -> None:
                     unsafe_allow_html=True,
                 )
                 if st.button(f"Ler: {poem.title}", key=f"gallery_{poem.id}"):
+                    st.switch_page("pages/poems.py")
+                    # Separar as guias (renderização de poemas, login, publicar, etc, 
+                    # que estão em definições neste arquivo) 
+                    # em páginas diferentes no diretório "pages" para possibilitar um "multipage app".
                     st.session_state["selected_poem_id"] = poem.id
                     st.session_state["page"] = "Poema"
                     st.rerun()
