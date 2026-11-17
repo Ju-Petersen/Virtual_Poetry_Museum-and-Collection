@@ -20,18 +20,22 @@ from src.models import Author, Poem, Report, Tag, User, ViewHistory
 
 st.set_page_config(page_title="Museu Virtual de Poesia", page_icon="📜", layout="wide")
 
-def slugify(value: str) -> str: # 
+def slugify(value: str) -> str:
+    # verificação de caracteres: aplica uma rera que "unifica" as entradas, 
+    # removendo letras maiusculas, espacos e caracteres especiais
     value = value.lower().strip()
     value = re.sub(r"[^a-z0-9]+", "-", value)
     return value.strip("-")
 
 def hash_password(value: str) -> str:
+    # faz uma especie de "criptografia" com as entradas, recebe a informacao como caracteres,
+    # converte-o em bytes para que o hashlib leia-o
     return hashlib.sha256(value.encode("utf-8")).hexdigest()
 
-def get_current_user() -> Optional[User]:
+def get_current_user() -> Optional[User]: # funcao que identifica qual o usuário esta conectado
     user_id = st.session_state.get("user_id")
-    if not user_id:
-        return None
+    if not user_id: # caso "não exista" um usuario logado
+        return None # o usuario nao precisa de login obrigatorio (none)
 
     session: Session = SessionLocal()
     try:
@@ -54,7 +58,7 @@ def record_view(poem: Poem, user: Optional[User]) -> None:
     finally:
         session.close()
 
-def render_gallery() -> None:
+def render_gallery() -> None: # Manter como página principal!!!!!!
     session: Session = SessionLocal()
     try:
         st.title("Galeria")
