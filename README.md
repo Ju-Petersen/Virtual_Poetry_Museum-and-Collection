@@ -36,7 +36,20 @@ Além disso, o sistema inclui:
 │   ├── app.py
 │   ├── config.py
 │   ├── database.py
-│   └── models.py
+│   ├── models.py
+│   ├── page_helpers.py
+│   └── pages/
+│       ├── account.py
+│       ├── authors.py
+│       ├── history.py
+│       ├── login.py
+│       ├── my_poems.py
+│       ├── my_texts.py
+│       ├── poems.py
+│       ├── publish.py
+│       ├── reports.py
+│       ├── tags.py
+│       └── users.py
 ├── tests/
 │   └── test_smoke.py
 ├── .gitignore
@@ -57,6 +70,9 @@ uv sync --group dev
 ```bash
 uv run streamlit run src/app.py
 ```
+
+O `app.py` abre a galeria inicial. As demais telas são carregadas como páginas
+independentes pelo menu de navegação do Streamlit, a partir de `src/pages/`.
 
 ## Banco de dados
 
